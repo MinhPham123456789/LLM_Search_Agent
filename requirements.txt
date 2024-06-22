@@ -1,0 +1,6 @@
+langchain 
+langchainhub 
+langchain-community 
+langchain-core
+langchain-text-splitters
+beautifulsoup4
