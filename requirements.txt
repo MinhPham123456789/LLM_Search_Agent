@@ -4,3 +4,5 @@ langchain-community
 langchain-core
 langchain-text-splitters
 beautifulsoup4
+playwright
+sentence-transformers
