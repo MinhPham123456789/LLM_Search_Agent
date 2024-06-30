@@ -42,6 +42,7 @@ class WebScraperCoreAsync():
             case _:
                 self.browser = await self.pw.firefox.launch(headless=True)
         self.bs_allowed_tags = [
+            'title',
             'h1',
             'h2',
             'h3',

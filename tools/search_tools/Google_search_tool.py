@@ -65,7 +65,7 @@ class GoogleSearchTool:
         web_contents = self.get_website_content_async(Google_urls_result)
         # result_hash_map is a dict, key: scraped_web_content's hash, value is (url, scraped_web_content)
         result_hash_map = self.generate_Google_result_hash_map(web_contents)
-        self.reranker.rerank_search_result(query, result_hash_map)
-        return result_hash_map
+        ordered_result_hash_map = self.reranker.rerank_search_result(query, result_hash_map)
+        return ordered_result_hash_map
 
 

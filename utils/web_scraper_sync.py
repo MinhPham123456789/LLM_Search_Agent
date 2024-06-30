@@ -31,6 +31,7 @@ class WebScraperSyncOneBrowser():
             case _:
                 self.browser = self.pw.firefox.launch(headless=True)
         self.bs_allowed_tags = [
+            'title'
             'h1',
             'h2',
             'h3',
@@ -117,6 +118,7 @@ class WebScraperSyncMultiBrowsers():
             return None
         self.browser_type = browser
         self.bs_allowed_tags = [
+            'title',
             'h1',
             'h2',
             'h3',
