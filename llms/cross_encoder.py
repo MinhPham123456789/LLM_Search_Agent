@@ -31,10 +31,11 @@ class CrossEncoder:
         # print("DEBUG MODE in cross_encoder.py")
         # for c in range(0, len(search_result_hash_map.values())):
         #     print(f'{list(search_result_hash_map.values())[c][0]}, {scores[c]}')
-        # # Add the ranking score
-        # for i in range(0, len(scores)):
-        #     content_hash = sha1(text_pairs[i][1].encode()).hexdigest()
-        #     search_result_hash_map[content_hash] = (search_result_hash_map[content_hash], scores[i])
+        
+        # Add the ranking score
+        for i in range(0, len(scores)):
+            content_hash = sha1(text_pairs[i][1].encode()).hexdigest()
+            search_result_hash_map[content_hash] = (search_result_hash_map[content_hash], scores[i])
         
         # Reorder the Google results
         ordered_result_hash_map = {k: v for k, v in sorted(search_result_hash_map.items(), key=lambda item: item[1][1], reverse=True)}

@@ -5,15 +5,16 @@ from utils.web_scraper_sync import WebScraperSyncMultiBrowsers, WebScraperSyncOn
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha1
 from llms.cross_encoder import CrossEncoder
-
+from utils.text_summarisation import TextSummariser
 
 class GoogleSearchTool:
-    def __init__(self, reranker: CrossEncoder):
+    def __init__(self, reranker: CrossEncoder, summariser: TextSummariser):
         config = configparser.ConfigParser()
         self.apis_db = config.read(config_path)
         self.GOOGLE_API_KEY = config['APIs']['GOOGLE_API_KEY']
         self.GOOGLE_CSE_ID = config['APIs']['GOOGLE_CSE_ID']
         self.reranker = reranker
+        self.summariser = summariser
 
     def Google_search(self, query):
         num_result = '6'
@@ -53,6 +54,23 @@ class GoogleSearchTool:
                 sha1_hash = sha1(result[1].encode()).hexdigest()
                 result_hash_map[sha1_hash] = result
         return result_hash_map
+    
+    def generate_Google_summarised_result_hash_map(self, Google_results, hash_map=None):
+        if hash_map == None:
+            result_hash_map = {}
+            for result in Google_results:
+                output = self.summariser.summarise_webcontent_text(result[0], result[1])
+                summary = output['output_text']
+                sha1_hash = sha1(summary.encode()).hexdigest()
+                result_hash_map[sha1_hash] = (result,summary)
+        else:
+            result_hash_map = hash_map
+            for result in Google_results:
+                output = self.summariser.summarise_webcontent_text(result[0], result[1])
+                summary = output['output_text']
+                sha1_hash = sha1(summary.encode()).hexdigest()
+                result_hash_map[sha1_hash] = (result,summary)
+        return result_hash_map
 
 
     def search(self, query):
@@ -64,7 +82,7 @@ class GoogleSearchTool:
         # web_contents is a list of tuples (url, scraped_web_content)
         web_contents = self.get_website_content_async(Google_urls_result)
         # result_hash_map is a dict, key: scraped_web_content's hash, value is (url, scraped_web_content)
-        result_hash_map = self.generate_Google_result_hash_map(web_contents)
+        result_hash_map = self.generate_Google_summarised_result_hash_map(web_contents)
         ordered_result_hash_map = self.reranker.rerank_search_result(query, result_hash_map)
         return ordered_result_hash_map
 

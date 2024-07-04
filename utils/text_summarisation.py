@@ -37,20 +37,27 @@ class TextSummariser:
         docs = [Document(page_content=x, metadata=metadata_content) for x in text_splitter.split_text(text)]
         return docs
     
-    def summarise_webcontent_text(self, webcontent_text, url):
-       metadata = {
-          'source': url,
-           'title': url,
-           'language': 'en'
-       }
-       docs = self.get_text_chunks_langchain_from_plaintext(metadata, webcontent_text)
-       chain = load_summarize_chain(self.summariser_llm, chain_type="map_reduce")
-       summary = chain.run(docs)
-       return summary
+    def summarise_webcontent_text(self, url, webcontent_text):
+        metadata = {
+            'source': url,
+            'title': url,
+            'language': 'en'
+        }
+        docs = self.get_text_chunks_langchain_from_plaintext(metadata, webcontent_text)
+        chain = load_summarize_chain(self.summariser_llm, chain_type="map_reduce")
+        summary = chain.invoke(docs)
+        return summary
     
     def summarise_long_text(self, long_text):
-       metadata_content = {'source':'multiple texts','language':'en'}
-       docs = self.get_text_chunks_langchain_from_plaintext(metadata_content, long_text)
-       chain = load_summarize_chain(self.summariser_llm, chain_type="map_reduce")
-       summary = chain.run(docs)
-       return summary
+        metadata_content = {'source':'multiple texts','language':'en'}
+        docs = self.get_text_chunks_langchain_from_plaintext(metadata_content, long_text)
+        chain = load_summarize_chain(self.summariser_llm, chain_type="map_reduce")
+        summary = chain.invoke(docs)
+        return summary
+    
+    def summarise_search_result(self, search_result_hash_map):
+        for key in search_result_hash_map.keys():
+            summary = self.summarise_webcontent_text(search_result_hash_map[key][0],
+                                                     search_result_hash_map[key][1])
+            search_result_hash_map[key] = (search_result_hash_map[key], summary)
+        return search_result_hash_map

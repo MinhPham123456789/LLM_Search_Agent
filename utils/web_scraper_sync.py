@@ -172,7 +172,11 @@ class WebScraperSyncMultiBrowsers():
             case _:
                 browser = pw.firefox.launch(headless=True)
         page = browser.new_page(extra_http_headers=custom_header)
-        response = page.goto(url)
+        try:
+            response = page.goto(url)
+        except TimeoutError:
+            error_message = "Error code: Timeout error 30000ms exceeded"
+            return error_message
         if response.status == 2000:
             page.wait_for_timeout(2000)
             web_html_content = page.content()
