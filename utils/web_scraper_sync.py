@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+from playwright._impl._errors import TimeoutError
 import random
 from bs4 import BeautifulSoup as bs
 import re

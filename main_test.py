@@ -37,11 +37,11 @@ from utils.text_summarisation import TextSummariser
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
 summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct")
 test = GoogleSearchTool(reranker, summ)
-result = test.search('Latest exploitable vulnerabilities in Google Chrome')
+result = test.search('Latest vulnerabilities in Google Chrome')
 for k in result.keys():
     print(f'###{k}')
-    print(result[k][0][0][0])
-    print(result[k][0][1])
+    # print(result[k][0][0][0])
+    print(result[k][0][0])
     print(result[k][1])
     
 

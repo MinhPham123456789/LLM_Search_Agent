@@ -59,15 +59,15 @@ class GoogleSearchTool:
         if hash_map == None:
             result_hash_map = {}
             for result in Google_results:
-                output = self.summariser.summarise_webcontent_text(result[0], result[1])
-                summary = output['output_text']
+                # output = self.summariser.summarise_webcontent_text(result[0], result[1])
+                summary = self.summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
                 sha1_hash = sha1(summary.encode()).hexdigest()
                 result_hash_map[sha1_hash] = (result,summary)
         else:
             result_hash_map = hash_map
             for result in Google_results:
-                output = self.summariser.summarise_webcontent_text(result[0], result[1])
-                summary = output['output_text']
+                # output = self.summariser.summarise_webcontent_text(result[0], result[1])
+                summary = self.summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
                 sha1_hash = sha1(summary.encode()).hexdigest()
                 result_hash_map[sha1_hash] = (result,summary)
         return result_hash_map
@@ -82,8 +82,12 @@ class GoogleSearchTool:
         # web_contents is a list of tuples (url, scraped_web_content)
         web_contents = self.get_website_content_async(Google_urls_result)
         # result_hash_map is a dict, key: scraped_web_content's hash, value is (url, scraped_web_content)
-        result_hash_map = self.generate_Google_summarised_result_hash_map(web_contents)
+        # result_hash_map = self.generate_Google_summarised_result_hash_map(web_contents)
+        result_hash_map = self.generate_Google_result_hash_map(web_contents)
         ordered_result_hash_map = self.reranker.rerank_search_result(query, result_hash_map)
-        return ordered_result_hash_map
+        # ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is ((url, scraped_web_content), ranker_score)
+        summarised_ordered_result_hash_map = self.summariser.summarise_search_result(ordered_result_hash_map)
+        # summarised_ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is (((url, scraped_web_content), ranker_score), summary)
+        return summarised_ordered_result_hash_map
 
 

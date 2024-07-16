@@ -3,7 +3,7 @@ from hashlib import sha1
 
 """
 Try
-cross-encoder/ms-marco-MiniLM-L-6-v2
+cross-encoder/ms-marco-MiniLM-L-6-v2 (sort_reverse: True)
 mixedbread-ai/mxbai-embed-large-v1
 """
 class CrossEncoder:
@@ -16,7 +16,7 @@ class CrossEncoder:
     def rerank(self, text_pairs_list):
         return self.model.score(text_pairs_list)
     
-    def rerank_search_result(self, query, search_result_hash_map):
+    def rerank_search_result(self, query, search_result_hash_map, reverse_signal=True):
         text_pairs = []
         for key in search_result_hash_map.keys():
             text_pairs.append(
@@ -38,5 +38,5 @@ class CrossEncoder:
             search_result_hash_map[content_hash] = (search_result_hash_map[content_hash], scores[i])
         
         # Reorder the Google results
-        ordered_result_hash_map = {k: v for k, v in sorted(search_result_hash_map.items(), key=lambda item: item[1][1], reverse=True)}
+        ordered_result_hash_map = {k: v for k, v in sorted(search_result_hash_map.items(), key=lambda item: item[1][1], reverse=reverse_signal)}
         return ordered_result_hash_map
