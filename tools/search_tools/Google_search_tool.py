@@ -5,7 +5,7 @@ from utils.web_scraper_sync import WebScraperSyncMultiBrowsers, WebScraperSyncOn
 from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha1
 from llms.cross_encoder import CrossEncoder
-from utils.text_summarisation import TextSummariser
+from utils.text_summariser.text_summarisation import TextSummariser
 
 class GoogleSearchTool:
     def __init__(self, reranker: CrossEncoder, summariser: TextSummariser):
@@ -86,7 +86,7 @@ class GoogleSearchTool:
         result_hash_map = self.generate_Google_result_hash_map(web_contents)
         ordered_result_hash_map = self.reranker.rerank_search_result(query, result_hash_map)
         # ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is ((url, scraped_web_content), ranker_score)
-        summarised_ordered_result_hash_map = self.summariser.summarise_search_result(ordered_result_hash_map)
+        summarised_ordered_result_hash_map = self.summariser.summarise_search_result(query, ordered_result_hash_map)
         # summarised_ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is (((url, scraped_web_content), ranker_score), summary)
         return summarised_ordered_result_hash_map
 

@@ -1,6 +1,6 @@
 from tools.search_tools.Google_search_tool import GoogleSearchTool
 from llms.cross_encoder import CrossEncoder
-from utils.text_summarisation import TextSummariser
+from utils.text_summariser.text_summarisation import TextSummariser
 from utils.utils import rearrange_search_result
 import streamlit as st
 
