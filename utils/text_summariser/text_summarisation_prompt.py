@@ -5,23 +5,44 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_core.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 
-def build_summariser_chain(llm, query):
-    # Map Reduce Prompt
-    # query = "Odoo 12.0 LFI vulnerabilities exploit code"
-    prompt_template = """Write a concise summary of the following:
+PROMPT_TEMPLATES = {
+    "web_content_sum_prompt":"""Extract all important details and write a summary using the extracted important details of the following:
 
 
 "{docs}"
 
 
-The concise summary must answer the query "%s". Do not provide unrelated comment or note or feedback question.
-CONCISE SUMMARY:"""%(query)
+The concise summary must answer the query "%s". Do not create unrelated comment or note or question.
+CONCISE SUMMARY:""",
+
+    "combine_prompt": """Keep all the details and combine the content of the following:
+
+
+"{docs}"
+
+
+The concise summary must answer the query "%s". Do not create unrelated comment or note or question.
+CONCISE SUMMARY:"""
+}
+
+def build_summariser_chain(llm, query, prompt_type):
+    # Map Reduce Prompt
+    # query = "Odoo 12.0 LFI vulnerabilities exploit code"
+    prompt_template = PROMPT_TEMPLATES[prompt_type]%(query)
     # prompt_template = "Write a concise summary of the following:\n\n\"{docs}\"\n\nThe concise summary must answer the query \"" + query +"\".\nCONCISE SUMMARY:"
     
     map_reduce_prompt = PromptTemplate(template=prompt_template, input_variables=["docs"])
 
     map_chain = LLMChain(llm=llm, prompt=map_reduce_prompt)
     reduce_chain = LLMChain(llm=llm, prompt=map_reduce_prompt)
+
+    # print("old:")
+    # print(reduce_chain)
+
+    # map_chain = map_reduce_prompt | llm
+    # reduce_chain = map_reduce_prompt | llm
+    # print("new:")
+    # print(reduce_chain)
 
     # Takes a list of documents, combines them into a single string, and passes this to an LLMChain
     combine_documents_chain = StuffDocumentsChain(

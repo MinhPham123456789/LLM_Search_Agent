@@ -3,6 +3,14 @@ from llms.cross_encoder import CrossEncoder
 from utils.text_summariser.text_summarisation import TextSummariser
 from utils.utils import rearrange_search_result
 import streamlit as st
+import configparser
+from global_config_path import config_path
+import os
+
+config = configparser.ConfigParser()
+config.read(config_path)
+os.environ['HUGGINGFACEHUB_API_TOKEN'] = config['APIs']['HF_TOKEN']
+
 
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
 summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct")
@@ -17,8 +25,8 @@ st.title("Better Search Engine")
 text_search = st.text_input("Search", value="")
 # Show the result cards
 if text_search:
-    result = engine.search(text_search)
-    structured_result = rearrange_search_result(result)
+    structured_result = engine.search(text_search)
+    # structured_result = rearrange_search_result(result)
     N_cards_per_row = 3
     result_order_number = 0
     for key in structured_result.keys():

@@ -6,21 +6,23 @@ from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha1
 from llms.cross_encoder import CrossEncoder
 from utils.text_summariser.text_summarisation import TextSummariser
+from utils.utils import rearrange_search_result
 
 class GoogleSearchTool:
-    def __init__(self, reranker: CrossEncoder, summariser: TextSummariser):
+    def __init__(self, reranker: CrossEncoder, summariser: TextSummariser, num_result:int = 6):
         config = configparser.ConfigParser()
         self.apis_db = config.read(config_path)
         self.GOOGLE_API_KEY = config['APIs']['GOOGLE_API_KEY']
         self.GOOGLE_CSE_ID = config['APIs']['GOOGLE_CSE_ID']
         self.reranker = reranker
         self.summariser = summariser
+        self.num_result = num_result
 
     def Google_search(self, query):
-        num_result = '6'
         url_encoded_query = requests.utils.requote_uri(query)
         url_encoded_query = url_encoded_query.replace('%20', '+')
-        search_url = f'https://customsearch.googleapis.com/customsearch/v1?q={url_encoded_query}&cx={self.GOOGLE_CSE_ID}&num={num_result}&key={self.GOOGLE_API_KEY}'
+        # print(url_encoded_query)
+        search_url = f'https://customsearch.googleapis.com/customsearch/v1?q={url_encoded_query}&cx={self.GOOGLE_CSE_ID}&num={self.num_result}&key={self.GOOGLE_API_KEY}'
         req = requests.get(url=search_url, timeout=2)
         if req.status_code == 200:
             json_response = req.json()
@@ -88,6 +90,7 @@ class GoogleSearchTool:
         # ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is ((url, scraped_web_content), ranker_score)
         summarised_ordered_result_hash_map = self.summariser.summarise_search_result(query, ordered_result_hash_map)
         # summarised_ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is (((url, scraped_web_content), ranker_score), summary)
-        return summarised_ordered_result_hash_map
+        the_result = rearrange_search_result(summarised_ordered_result_hash_map)
+        return the_result
 
 

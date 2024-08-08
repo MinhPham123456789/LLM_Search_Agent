@@ -178,7 +178,7 @@ class WebScraperSyncMultiBrowsers():
         except TimeoutError:
             error_message = "Error code: Timeout error 30000ms exceeded"
             return error_message
-        if response.status == 2000:
+        if response.status == 200:
             page.wait_for_timeout(2000)
             web_html_content = page.content()
             page.close()
