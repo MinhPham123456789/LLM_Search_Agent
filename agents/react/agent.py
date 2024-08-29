@@ -3,14 +3,26 @@ from agents.react.prompt import *
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain.callbacks.tracers import ConsoleCallbackHandler
 from agents.agent_utils import manage_tools
+from agents.react.output_parser import ReActAgentParser
 
 class Custom_ReAct_Agent:
     def __init__(self, model_name: str, tools:dict, max_iter_num:int = 5):
         self.tools = manage_tools(tools)
         self.memory = ''
-        self.llm = HuggingFaceEndpoint(repo_id = model_name, stream=True)
+        self.llm = HuggingFaceEndpoint(repo_id = model_name, stream=True, stop_sequences=["#Observation:"])
         self.max_iter_num = max_iter_num
         self.prompt = None
+        self.parser = ReActAgentParser()
+
+    def add_memory(self, data):
+        self.memory = f'{self.memory}{data}\n'
+    
+    def get_memory(self):
+        return self.memory
+    
+    def run_action(self, action_dict):
+        result = self.tools[action_dict['action']].run(action_dict['action_input'])
+        return result
 
     def create_prompt(self):
         tool_descs = "\n".join([f"{self.tools[k].name}: {self.tools[k].description}" for k in self.tools.keys()])
@@ -32,20 +44,59 @@ class Custom_ReAct_Agent:
                 SYSTEM_MESSAGE_SUFFIX
             ]
         )
-        human_prompt = HUMAN_MESSAGE
+
+        # Add in memory/completed actions
+        human_prompt = "\n\n".join(
+            [
+                HUMAN_MESSAGE,
+                self.get_memory()
+            ]
+        )
         self.prompt = ChatPromptTemplate.from_messages(
             [("system",system_prompt), ("user", human_prompt)]
         )
         return self.prompt
-        
 
-    def add_memory(self, data):
-        self.memory = f'{self.memory}{data}\n'
-    
-    def get_memory(self):
-        return self.memory
-    
     def chat(self, user_input):
-        agent_prompt = self.create_prompt()
-        chain = agent_prompt | self.llm
-        print(chain.invoke({"input": user_input}, config={"callbacks":[ConsoleCallbackHandler()]}))
+        # Head start Search action
+#         head_start_search_result = self.tools["Search"].run(user_input)
+#         # Inject memory
+#         inject_memory = """Thought: Research on {input}.
+# Action:
+# ```
+# {{
+#   "action": "Search",
+#   "action_input": "{input}"
+# }}
+# ```
+# Observation: """
+#         inject_memory = f'{inject_memory}{head_start_search_result}\nThought: '
+#         self.add_memory(inject_memory)
+        # Create agent prompt
+        for i in range(0, self.max_iter_num):
+            agent_prompt = self.create_prompt()
+            chain = agent_prompt | self.llm
+            chain_output = chain.invoke({"input": user_input}) #s, config={"callbacks":[ConsoleCallbackHandler()]})
+            # print("AAAAAAAAAAAAA")
+            print(chain_output)
+            # print("BBBBBBBBBBBBBBB")
+            parsed_llm_response = self.parser.extract_llm_response(chain_output)
+            # print(parsed_llm_response)
+            if parsed_llm_response.get("Final Answer") is not None:
+                print(f"#Final Answer: {parsed_llm_response['Final Answer']}")
+                break
+            observation = self.run_action(parsed_llm_response)
+            parsed_llm_response['observation'] = observation
+            print(f'#Observation: {observation}\n\n')
+            # Update memory
+            new_memory = """#Thought: {thought}
+#Action:
+```
+  "action": {action},
+  "action_input": {action_input}
+```
+#Observation: {observation}
+
+#Thought: 
+""".format(**parsed_llm_response)
+            self.add_memory(new_memory)

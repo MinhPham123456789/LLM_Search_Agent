@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-from playwright._impl._errors import TimeoutError
+from playwright._impl._errors import TimeoutError, Error
 import random
 from bs4 import BeautifulSoup as bs
 import re
@@ -177,6 +177,9 @@ class WebScraperSyncMultiBrowsers():
             response = page.goto(url)
         except TimeoutError:
             error_message = "Error code: Timeout error 30000ms exceeded"
+            return error_message
+        except Error:
+            error_message = f"Error code: {Error}"
             return error_message
         if response.status == 200:
             page.wait_for_timeout(2000)

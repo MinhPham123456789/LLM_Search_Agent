@@ -19,7 +19,7 @@ engine = GoogleSearchTool(reranker, summ) # May want to change the number of res
 # structured_result = rearrange_search_result(result)
 
 # Page setups
-st.set_page_config(page_title="Better Search Engine", page_icon="🐍", layout="wide")
+st.set_page_config(page_title="Better Search Engine", page_icon="🔍", layout="wide")
 st.title("Better Search Engine")
 # Use a text_input to get the keywords to filter the dataframe
 text_search = st.text_input("Search", value="")

@@ -7,15 +7,17 @@ from hashlib import sha1
 from llms.cross_encoder import CrossEncoder
 from utils.text_summariser.text_summarisation import TextSummariser
 from utils.utils import rearrange_search_result
+from utils.utils import get_top_3_and_summarise
 
 class GoogleSearchTool:
-    def __init__(self, reranker: CrossEncoder, summariser: TextSummariser, num_result:int = 6):
+    def __init__(self, reranker: CrossEncoder, website_summariser: TextSummariser, summaries_summariser: TextSummariser, num_result:int = 6):
         config = configparser.ConfigParser()
         self.apis_db = config.read(config_path)
         self.GOOGLE_API_KEY = config['APIs']['GOOGLE_API_KEY']
         self.GOOGLE_CSE_ID = config['APIs']['GOOGLE_CSE_ID']
         self.reranker = reranker
-        self.summariser = summariser
+        self.website_summariser = website_summariser
+        self.summaries_summariser = summaries_summariser
         self.num_result = num_result
 
     def Google_search(self, query):
@@ -62,14 +64,14 @@ class GoogleSearchTool:
             result_hash_map = {}
             for result in Google_results:
                 # output = self.summariser.summarise_webcontent_text(result[0], result[1])
-                summary = self.summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
+                summary = self.website_summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
                 sha1_hash = sha1(summary.encode()).hexdigest()
                 result_hash_map[sha1_hash] = (result,summary)
         else:
             result_hash_map = hash_map
             for result in Google_results:
                 # output = self.summariser.summarise_webcontent_text(result[0], result[1])
-                summary = self.summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
+                summary = self.website_summariser.summarise_webcontent_text(result[0], result[1]) #output['output_text']
                 sha1_hash = sha1(summary.encode()).hexdigest()
                 result_hash_map[sha1_hash] = (result,summary)
         return result_hash_map
@@ -88,9 +90,16 @@ class GoogleSearchTool:
         result_hash_map = self.generate_Google_result_hash_map(web_contents)
         ordered_result_hash_map = self.reranker.rerank_search_result(query, result_hash_map)
         # ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is ((url, scraped_web_content), ranker_score)
-        summarised_ordered_result_hash_map = self.summariser.summarise_search_result(query, ordered_result_hash_map)
+        summarised_ordered_result_hash_map = self.website_summariser.summarise_search_result(query, ordered_result_hash_map)
         # summarised_ordered_result_hash_map is a dict, key: scraped_web_content's hash, value is (((url, scraped_web_content), ranker_score), summary)
         the_result = rearrange_search_result(summarised_ordered_result_hash_map)
         return the_result
 
+    def agent_tool_search(self, query):
+        result_dict = self.search(query)
+        return get_top_3_and_summarise(result_dict, query, self.summaries_summariser)
+
+    def tool_search(self, query):
+        result_dict = self.search(query)
+        return get_top_3_and_summarise(result_dict, query, self.summaries_summariser), result_dict
 
