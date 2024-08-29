@@ -15,11 +15,11 @@ FORMAT_INSTRUCTIONS = """Based on the query and previous actions, plan a new Act
 The way you use the tools is by specifying a `action` key (with the name of the tool to use) and a `action_input` key (with the input to the tool going here).
 The response should only contain a SINGLE action, do NOT return a list of multiple actions.
 
-ALWAYS use the following format:
+ALWAYS STRICTLY use the following format:
 
 #Query: the input query you must answer
 #Thought: you should always think about what to do
-#action: the action to take, should be one of [{tool_names}]
+#action: the action to take, should be one of {tool_names}
 #action_input: the input to the action
 #Observation: the result of the action
 ...

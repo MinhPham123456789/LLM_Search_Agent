@@ -108,7 +108,7 @@ search_tool = StructuredTool.from_function(
 # "Write a snake game using Golang"
 # Do users have ownership of their data in HALO ticket system?
 # 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?'
-QUERY = 'Write a snake game using Golang'
+QUERY = 'Write a basic tic tac toe game using Golang'
 # print(search_tool.run(QUERY))
 # print(search_tool.name)
 # print(search_tool.description)

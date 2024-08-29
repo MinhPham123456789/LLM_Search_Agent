@@ -9,7 +9,7 @@ class Custom_ReAct_Agent:
     def __init__(self, model_name: str, tools:dict, max_iter_num:int = 5):
         self.tools = manage_tools(tools)
         self.memory = ''
-        self.llm = HuggingFaceEndpoint(repo_id = model_name, stream=True, stop_sequences=["#Observation:"])
+        self.llm = HuggingFaceEndpoint(repo_id = model_name, stream=True, stop_sequences=["#Observation:", "#Query:", "# Query:"])
         self.max_iter_num = max_iter_num
         self.prompt = None
         self.parser = ReActAgentParser()
@@ -22,6 +22,7 @@ class Custom_ReAct_Agent:
     
     def run_action(self, action_dict):
         result = self.tools[action_dict['action']].run(action_dict['action_input'])
+        result = result.replace('{', "{{").replace('}', "}}") # Escape {} for prompt template
         return result
 
     def create_prompt(self):
@@ -74,6 +75,7 @@ class Custom_ReAct_Agent:
 #         self.add_memory(inject_memory)
         # Create agent prompt
         for i in range(0, self.max_iter_num):
+            print(f"#########COUNT: {i}")
             agent_prompt = self.create_prompt()
             chain = agent_prompt | self.llm
             chain_output = chain.invoke({"input": user_input}) #s, config={"callbacks":[ConsoleCallbackHandler()]})
@@ -90,11 +92,8 @@ class Custom_ReAct_Agent:
             print(f'#Observation: {observation}\n\n')
             # Update memory
             new_memory = """#Thought: {thought}
-#Action:
-```
-  "action": {action},
-  "action_input": {action_input}
-```
+#action: {action},
+#action_input: {action_input}
 #Observation: {observation}
 
 #Thought: 
