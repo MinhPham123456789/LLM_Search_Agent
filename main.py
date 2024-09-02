@@ -52,26 +52,3 @@ if text_search:
             st.markdown(f"{search_result_dict[key]['url']}")
         result_order_number = result_order_number + 1
 
-    # N_cards_per_row = 3
-    # result_order_number = 0
-    # cols = st.columns(N_cards_per_row, gap="large")
-    # for key in range(1,7):
-    #     if result_order_number==0:
-    #         with cols[0]:
-    #             st.caption(f"Score  {key} ")
-    #             st.markdown(f"*{'A'*1000}*")
-    #             st.markdown(f"**{key}**")
-    #     elif result_order_number<3:
-    #         with cols[1]:
-    #             st.write("---")
-    #             st.caption(f"Score  {key} ")
-    #             st.markdown(f"*{key}*")
-    #             st.markdown(f"**{key}**")
-    #     else:
-    #         with cols[2]:
-    #             st.write("---")
-    #             st.caption(f"Score  {key} ")
-    #             st.markdown(f"*{key}*")
-    #             st.markdown(f"**{key}**")
-    #     result_order_number = result_order_number + 1
-
