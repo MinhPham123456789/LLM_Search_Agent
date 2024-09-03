@@ -13,3 +13,4 @@ A ReAct agent to research a topic/query provided by user. The ReAct agent's adva
 + Add a webpage for the ReAct Search agent
 + Put search bar down and stick to the web window
 + Add up search history without regenerate the whole webpage
+## Enhance content summarisation
