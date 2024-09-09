@@ -8,9 +8,13 @@ A ReAct agent to research a topic/query provided by user. The ReAct agent's adva
 ## System
 + Build up connection between ReAct Search agent core and web client layout
 ## ReAct agent
-+ Add a conclusion prompt to help the agetn conclude the research better
++ Check on the agent memory display, why there are 2 final answer prompts
++ Add a conclusion prompt to help the agent conclude the research better
 ## Web layout
 + Add a webpage for the ReAct Search agent
 + Put search bar down and stick to the web window
 + Add up search history without regenerate the whole webpage
-## Enhance content summarisation
+
+# Random Bugs
+## PlayWright Sync request with concurrent thread problem
++ Try agent search with query like "ISM GPO guideline"

@@ -7,3 +7,4 @@ beautifulsoup4==4.12.3
 playwright==1.44.0
 sentence-transformers==3.0.1
 streamlit==1.36.0
+tiktoken==0.7.0

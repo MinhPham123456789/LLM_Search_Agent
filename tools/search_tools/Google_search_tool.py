@@ -95,9 +95,9 @@ class GoogleSearchTool:
         the_result = rearrange_search_result(summarised_ordered_result_hash_map)
         return the_result
 
-    def agent_tool_search(self, query): # Just wrapper on top the search method, which is the main one
-        result_dict = self.search(query)
-        return get_top_3_and_summarise(result_dict, query, self.summaries_summariser)
+    # def agent_tool_search(self, query): # Just wrapper on top the search method, which is the main one
+    #     result_dict = self.search(query)
+    #     return get_top_3_and_summarise(result_dict, query, self.summaries_summariser)
 
     def tool_search(self, query): # Just wrapper on top the search method, which is the main one
         result_dict = self.search(query)

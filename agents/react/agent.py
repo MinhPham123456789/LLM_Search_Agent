@@ -21,9 +21,9 @@ class Custom_ReAct_Agent:
         return self.memory
     
     def run_action(self, action_dict):
-        result = self.tools[action_dict['action']].run(action_dict['action_input'])
+        result, search_result_dict = self.tools[action_dict['action']].run(action_dict['action_input'])
         result = result.replace('{', "{{").replace('}', "}}") # Escape {} for prompt template
-        return result
+        return result, search_result_dict
 
     def create_prompt(self):
         tool_descs = "\n".join([f"{self.tools[k].name}: {self.tools[k].description}" for k in self.tools.keys()])
@@ -74,11 +74,12 @@ class Custom_ReAct_Agent:
 #         inject_memory = f'{inject_memory}{head_start_search_result}\nThought: '
 #         self.add_memory(inject_memory)
         # Create agent prompt
+        search_result_dict_list = []
         for i in range(0, self.max_iter_num):
             print(f"#########COUNT: {i}")
             agent_prompt = self.create_prompt()
             chain = agent_prompt | self.llm
-            chain_output = chain.invoke({"input": user_input}) #s, config={"callbacks":[ConsoleCallbackHandler()]})
+            chain_output = chain.invoke({"input": user_input})#, config={"callbacks":[ConsoleCallbackHandler()]})
             # print("AAAAAAAAAAAAA")
             print(chain_output)
             # print("BBBBBBBBBBBBBBB")
@@ -86,16 +87,20 @@ class Custom_ReAct_Agent:
             # print(parsed_llm_response)
             if parsed_llm_response.get("Final Answer") is not None:
                 print(f"#Final Answer: {parsed_llm_response['Final Answer']}")
+                self.add_memory(f"#Final Answer: {parsed_llm_response['Final Answer']}")
                 break
-            observation = self.run_action(parsed_llm_response)
+            observation, search_result_dict = self.run_action(parsed_llm_response)
+            search_result_dict_list.append(search_result_dict)
             parsed_llm_response['observation'] = observation
             print(f'#Observation: {observation}\n\n')
             # Update memory
             new_memory = """#Thought: {thought}
-#action: {action},
-#action_input: {action_input}
+#Action: {action}
+#Action Input: {action_input}
 #Observation: {observation}
 
 #Thought: 
 """.format(**parsed_llm_response)
             self.add_memory(new_memory)
+
+        return self.memory, search_result_dict_list

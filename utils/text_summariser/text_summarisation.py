@@ -31,7 +31,7 @@ class TextSummariser:
         self.chain = build_summariser_chain(self.summariser_llm, query, self.prompt_type)
 
     def get_text_chunks_langchain_from_plaintext(self, metadata, text):
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=6144, chunk_overlap=150, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=1024, chunk_overlap=120) #, length_function=len)
         metadata_content = metadata
         docs = [Document(page_content=x, metadata=metadata_content) for x in text_splitter.split_text(text)]
         return docs

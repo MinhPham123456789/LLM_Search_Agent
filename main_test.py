@@ -100,7 +100,7 @@ class SearchEngineInput(BaseModel):
     query: str = Field(description="should be a search query")
 
 search_tool = StructuredTool.from_function(
-    func=engine.agent_tool_search,
+    func=engine.tool_search,
     name="Search",
     description="useful for when you need to answer questions about current events",
     args_schema=SearchEngineInput

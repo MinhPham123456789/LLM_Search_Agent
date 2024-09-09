@@ -9,8 +9,8 @@ import re
 class ReActAgentParser():
     def __init__(self):
         self.thought_re_pattern = r'^#Thought: (.*?)$'
-        self.action_re_pattern = r'^#action: (.*?)$'
-        self.action_input_re_pattern = r'^#action_input: \"*(.*?)\"*$'
+        self.action_re_pattern = r'^#Action: (.*?)$'
+        self.action_input_re_pattern = r'^#Action Input: \"*(.*?)\"*$'
         self.final_answer_re_pattern = r'^#Final Answer:\s*\n*(.*?)$'
 
     def extract_thought(self, text):
@@ -41,9 +41,9 @@ class ReActAgentParser():
         extracted_llm_response.update(self.extract_thought(text))
         if "Final Answer" in text:
             extracted_llm_response.update(self.extract_final_answer(text))
-        elif "action" in text and "action_input" in text:
+        elif "Action" in text and "Action Input" in text:
             extracted_llm_response.update(self.extract_action(text))
         else:
-            raise OutputParserException(f"Could not parse LLM Output: {text}")
+            raise OutputParserException(f"Could find action keywords in LLM Output: {text}")
         return extracted_llm_response
 
