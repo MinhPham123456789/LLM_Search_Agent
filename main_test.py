@@ -8,6 +8,8 @@ from utils.text_summariser.text_summarisation import TextSummariser
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.tools import StructuredTool
 
+from utils.utils import LLMMonitor
+
 from agents.react.agent import Custom_ReAct_Agent
 import configparser
 from global_config_path import config_path
@@ -59,14 +61,18 @@ os.environ['HUGGINGFACEHUB_API_TOKEN'] = config['APIs']['HF_TOKEN']
 #     print(result[k][1])
     
 
-# Testing the summariser
-# summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct")
-# test = WebScraperSyncMultiBrowsers()
-# url ='https://www.exploit-db.com/exploits/48609'
-# test_result = test.get_website_content(url)
-# summ_text = summ.summarise_webcontent_text(test_result[0],test_result[1])
-# print(test_result[0])
-# print(summ_text['output_text'])
+# Testing the summariser and monitor callback
+llm_monitor = LLMMonitor()
+summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct", "web_content_sum_prompt", llm_monitor)
+test = WebScraperSyncMultiBrowsers()
+url = 'https://patchthenet.com/blog/linux-privilege-escalation-three-easy-ways-to-get-a-root-shell' #'https://www.exploit-db.com/exploits/48609'
+query = 'Privilege Escalation in Linux' # 'Exploit code for Odoo 12'
+summ.set_summary_chain(query)
+test_result = test.get_website_content(url)
+summ_text = summ.summarise_webcontent_text(test_result[0],test_result[1])
+print(test_result[0])
+print(summ_text)
+print(llm_monitor.get_metrics())
 
 # Testing the summariser prompt
 # summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct")
@@ -91,34 +97,38 @@ os.environ['HUGGINGFACEHUB_API_TOKEN'] = config['APIs']['HF_TOKEN']
 # print(summ_text['output_text'])
 
 # Test tool
-reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
-web_summ = TextSummariser("mistralai/Mistral-7B-Instruct-v0.3", "web_content_sum_prompt")
-sum_sum = TextSummariser("mistralai/Mistral-7B-Instruct-v0.3","combine_prompt") # mistralai/Mistral-7B-Instruct-v0.3, meta-llama/Meta-Llama-3-8B-Instruct
-engine = GoogleSearchTool(reranker, web_summ, sum_sum)
+# reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
+# web_summ = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct", "web_content_sum_prompt")
+# sum_sum = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct","combine_prompt") # mistralai/Mistral-7B-Instruct-v0.3, meta-llama/Meta-Llama-3-8B-Instruct
+# engine = GoogleSearchTool(reranker, web_summ, sum_sum)
 
-class SearchEngineInput(BaseModel):
-    query: str = Field(description="should be a search query")
+# class SearchEngineInput(BaseModel):
+#     query: str = Field(description="should be a search query")
 
-search_tool = StructuredTool.from_function(
-    func=engine.tool_search,
-    name="Search",
-    description="useful for when you need to answer questions about current events",
-    args_schema=SearchEngineInput
-)
-# "Write a snake game using Golang"
-# Do users have ownership of their data in HALO ticket system?
-# 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?'
-QUERY = 'Write a basic tic tac toe game using Golang'
-# print(search_tool.run(QUERY))
-# print(search_tool.name)
-# print(search_tool.description)
-# print(search_tool.args)
-# result_dict = search_tool.run(QUERY)
+# search_tool = StructuredTool.from_function(
+#     func=engine.tool_search,
+#     name="Search",
+#     description="useful for when you need to answer questions about current events",
+#     args_schema=SearchEngineInput
+# )
+# # "Write a snake game using Golang"
+# # Do users have ownership of their data in HALO ticket system?
+# # 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?'
+# QUERY = 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?' #'Write a basic tic tac toe game using Golang'
+# # print(search_tool.run(QUERY))
+# # print(search_tool.name)
+# # print(search_tool.description)
+# # print(search_tool.args)
+# sum_sum, result_dict = search_tool.run(QUERY)
 
-# top_3 = "\n".join([ result_dict[k]["summary"] for k in list(result_dict.keys())[:3] ])
-
+# print("Main summary:")
+# print(sum_sum)
+# print("Sub summaries:")
 # for k in result_dict.keys():
 #     print(f"{result_dict[k]['url']} {result_dict[k]['score']}")
+#     print(f"{result_dict[k]['summary']}")
+
+# top_3 = "\n".join([ result_dict[k]["summary"] for k in list(result_dict.keys())[:3] ])
 
 # print(top_3)
 
@@ -132,5 +142,8 @@ QUERY = 'Write a basic tic tac toe game using Golang'
 
 # Test agent
 # Model: microsoft/Phi-3-mini-4k-instruct, google/gemma-1.1-7b-it, google/gemma-2-2b-it
-agent = Custom_ReAct_Agent("microsoft/Phi-3-mini-4k-instruct", [search_tool])
-agent.chat(QUERY)
+# agent = Custom_ReAct_Agent("microsoft/Phi-3-mini-4k-instruct", [search_tool])
+# mem, result_dict = agent.chat(QUERY, True)
+# for k in result_dict.keys():
+#     print(f"{result_dict[k]['url']} {result_dict[k]['score']}")
+#     print(f"{result_dict[k]['summary']}")

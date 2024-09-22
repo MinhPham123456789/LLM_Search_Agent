@@ -58,7 +58,22 @@ class Custom_ReAct_Agent:
         )
         return self.prompt
 
-    def chat(self, user_input):
+    def create_concluding_prompt(self):
+        concluding_system_prompt = CONCLUDING_PROMPT_SYSTEM.format(**{
+            "memory": self.memory,
+        })
+        concluding_human_prompt = CONCLUDING_PROMPT_HUMAN
+        return ChatPromptTemplate.from_messages(
+            [("system",concluding_system_prompt), ("user", concluding_human_prompt)]
+        )
+
+    def chat_conclude(self, user_input):
+        agent_concluding_prompt = self.create_concluding_prompt()
+        chain = agent_prompt | self.llm
+        chain_output = chain.invoke({"input": user_input})#, config={"callbacks":[ConsoleCallbackHandler()]})
+        print(f'#Conclusion: {chain_output}')
+
+    def chat(self, user_input, DEBUG=not True):
         # Head start Search action
 #         head_start_search_result = self.tools["Search"].run(user_input)
 #         # Inject memory
@@ -80,19 +95,25 @@ class Custom_ReAct_Agent:
             agent_prompt = self.create_prompt()
             chain = agent_prompt | self.llm
             chain_output = chain.invoke({"input": user_input})#, config={"callbacks":[ConsoleCallbackHandler()]})
-            # print("AAAAAAAAAAAAA")
-            print(chain_output)
-            # print("BBBBBBBBBBBBBBB")
             parsed_llm_response = self.parser.extract_llm_response(chain_output)
             # print(parsed_llm_response)
             if parsed_llm_response.get("Final Answer") is not None:
-                print(f"#Final Answer: {parsed_llm_response['Final Answer']}")
+                if DEBUG:
+                    print(f"#Final Answer: {parsed_llm_response['Final Answer']}")
                 self.add_memory(f"#Final Answer: {parsed_llm_response['Final Answer']}")
+                self.chat_conclude(user_input)
                 break
             observation, search_result_dict = self.run_action(parsed_llm_response)
             search_result_dict_list.append(search_result_dict)
             parsed_llm_response['observation'] = observation
-            print(f'#Observation: {observation}\n\n')
+
+            if DEBUG:
+                print(chain_output)
+                print(f'#Observation: {observation}\n\n')
+                for k in search_result_dict.keys():
+                    print(f"{search_result_dict[k]['url']} {search_result_dict[k]['score']}")
+                    print(f"{search_result_dict[k]['summary']}")
+            
             # Update memory
             new_memory = """#Thought: {thought}
 #Action: {action}

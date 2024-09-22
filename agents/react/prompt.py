@@ -29,3 +29,16 @@ ALWAYS STRICTLY use the following format:
 
 SYSTEM_MESSAGE_SUFFIX = """Begin! Reminder to always use the exact characters `Final Answer` when responding."""
 HUMAN_MESSAGE = "#Query: {input}"
+
+# CONCLUDING PROMPT SECTION
+
+CONCLUDING_PROMPT_SYSTEM = """The current stage is the concluding stage. In the previous interactions, you have already found some information by searching on your own for the user's given goals and problems.
+All the found information is in the following:
+```
+{memory}
+```
+"""
+CONCLUDING_PROMPT_HUMAN = """Based on the found information, you need to use all relevant information and provide the Final Answer to user's query '{input}'.
+
+#Final Answer:
+"""

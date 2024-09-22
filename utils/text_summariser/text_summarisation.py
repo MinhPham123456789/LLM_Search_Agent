@@ -20,9 +20,9 @@ https://patchthenet.com/blog/linux-privilege-escalation-three-easy-ways-to-get-a
 
 """
 class TextSummariser:
-    def __init__(self, model_name, prompt_type):
+    def __init__(self, model_name, prompt_type, callback):
         self.model_name = model_name
-        self.summariser_llm = HuggingFaceEndpoint(repo_id=self.model_name, temperature=0.2) 
+        self.summariser_llm = HuggingFaceEndpoint(repo_id=self.model_name, temperature=0.2, callbacks=[callback]) 
         # mistralai/Mistral-7B-Instruct-v0.3, meta-llama/Meta-Llama-3-8B-Instruct, HuggingFaceH4/zephyr-orpo-141b-A35b-v0.1
         self.prompt_type = prompt_type
         self.chain = None

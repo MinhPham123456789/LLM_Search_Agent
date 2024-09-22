@@ -13,8 +13,8 @@ os.environ['HUGGINGFACEHUB_API_TOKEN'] = config['APIs']['HF_TOKEN']
 
 
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
-web_sum = TextSummariser("mistralai/Mistral-7B-Instruct-v0.3", "web_content_sum_prompt")
-sum_sum = TextSummariser("mistralai/Mistral-7B-Instruct-v0.3","combine_prompt")
+web_sum = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct", "web_content_sum_prompt")
+sum_sum = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct","combine_prompt")
 engine = GoogleSearchTool(reranker, web_sum, sum_sum) # May want to change the number of result to 10 max
 
 # To continuously add content to client side with streamlit
