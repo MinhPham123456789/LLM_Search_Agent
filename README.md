@@ -10,6 +10,7 @@ A ReAct agent to research a topic/query provided by user. The ReAct agent's adva
 ## ReAct agent
 + Check on the agent memory display, why there are 2 final answer prompts
 + Add a conclusion prompt to help the agent conclude the research better
++ Need to train the LLM model so it can familiarise with the ReAct agent instruction structure
 ## Web layout
 + Add a webpage for the ReAct Search agent
 + Put search bar down and stick to the web window
@@ -18,3 +19,11 @@ A ReAct agent to research a topic/query provided by user. The ReAct agent's adva
 # Random Bugs
 ## PlayWright Sync request with concurrent thread problem
 + Try agent search with query like "ISM GPO guideline"
+
+# Test Run
+## LLM Assisted Search Engine
+![LLM Assisted Search Engine example 1](docs/LLM_Assisted_Search_Engine_example1.png)
+![LLM Assisted Search Engine example 2](docs/LLM_Assisted_Search_Engine_example2.png)
+## LLM Search ReAct Agent
+![LLM Search ReAct Agent example 1](docs/LLM_Search_Agent_Example1.png)
+![LLM Search ReAct Agent example 2](docs/LLM_Search_Agent_Example2.png)
