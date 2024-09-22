@@ -3,6 +3,7 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.llms import HuggingFaceEndpoint
+from langchain_groq import ChatGroq
 from utils.text_summariser.text_summarisation_prompt import build_summariser_chain
 
 
@@ -22,8 +23,11 @@ https://patchthenet.com/blog/linux-privilege-escalation-three-easy-ways-to-get-a
 class TextSummariser:
     def __init__(self, model_name, prompt_type, callback):
         self.model_name = model_name
-        self.summariser_llm = HuggingFaceEndpoint(repo_id=self.model_name, temperature=0.2, callbacks=[callback]) 
+        # Huggingface model hub
+        # self.summariser_llm = HuggingFaceEndpoint(repo_id=self.model_name, temperature=0.2, callbacks=[callback]) 
         # mistralai/Mistral-7B-Instruct-v0.3, meta-llama/Meta-Llama-3-8B-Instruct, HuggingFaceH4/zephyr-orpo-141b-A35b-v0.1
+        # Groq model hub
+        self.summariser_llm = ChatGroq(model=self.model_name, temperature=0.2, callbacks=[callback])
         self.prompt_type = prompt_type
         self.chain = None
 

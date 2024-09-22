@@ -45,7 +45,7 @@ class LLMMonitor(BaseCallbackHandler):
         self.llm_calls += 1
 
     def on_llm_end(self, response, **kwargs):
-        duration = self.start_time - time()
+        duration = time() - self.start_time
         self.total_duration += duration
         self.call_durations.append(duration)
 

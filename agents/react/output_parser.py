@@ -8,10 +8,10 @@ import re
 
 class ReActAgentParser():
     def __init__(self):
-        self.thought_re_pattern = r'^#Thought: (.*?)$'
-        self.action_re_pattern = r'^#Action: (.*?)$'
-        self.action_input_re_pattern = r'^#Action Input: \"*(.*?)\"*$'
-        self.final_answer_re_pattern = r'^#Final Answer:\s*\n*(.*?)$'
+        self.thought_re_pattern = r'^##Thought: (.*?)$'
+        self.action_re_pattern = r'^##Action: (.*?)$'
+        self.action_input_re_pattern = r'^##Action Input: \"*(.*?)\"*$'
+        self.final_answer_re_pattern = r'^##Final Answer:\s*\n*(.*?)$'
 
     def extract_thought(self, text):
         re_match = re.search(self.thought_re_pattern, text, re.MULTILINE)
@@ -39,7 +39,7 @@ class ReActAgentParser():
     def extract_llm_response(self, text):
         extracted_llm_response = {}
         extracted_llm_response.update(self.extract_thought(text))
-        if "Final Answer" in text:
+        if "Final Answer" in text and "Action" not in text:
             extracted_llm_response.update(self.extract_final_answer(text))
         elif "Action" in text and "Action Input" in text:
             extracted_llm_response.update(self.extract_action(text))

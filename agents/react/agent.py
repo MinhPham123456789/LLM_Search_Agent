@@ -6,10 +6,14 @@ from agents.agent_utils import manage_tools
 from agents.react.output_parser import ReActAgentParser
 
 class Custom_ReAct_Agent:
-    def __init__(self, model_name: str, tools:dict, max_iter_num:int = 5):
+    def __init__(self, model_name: str, tools:dict, callback, max_iter_num:int = 5):
         self.tools = manage_tools(tools)
         self.memory = ''
-        self.llm = HuggingFaceEndpoint(repo_id = model_name, stream=True, stop_sequences=["#Observation:", "#Query:", "# Query:"])
+        self.llm = HuggingFaceEndpoint(
+            repo_id = model_name, 
+            callbacks=[callback],
+            stream=True, 
+            stop_sequences=["##Observation:", "##Query:", "## Query:", "# Query:"])
         self.max_iter_num = max_iter_num
         self.prompt = None
         self.parser = ReActAgentParser()
@@ -69,9 +73,10 @@ class Custom_ReAct_Agent:
 
     def chat_conclude(self, user_input):
         agent_concluding_prompt = self.create_concluding_prompt()
-        chain = agent_prompt | self.llm
+        chain = agent_concluding_prompt | self.llm
         chain_output = chain.invoke({"input": user_input})#, config={"callbacks":[ConsoleCallbackHandler()]})
-        print(f'#Conclusion: {chain_output}')
+        self.add_memory(f'##Conclusion: {chain_output}')
+        # print(f'##Conclusion: {chain_output}')
 
     def chat(self, user_input, DEBUG=not True):
         # Head start Search action
@@ -99,8 +104,8 @@ class Custom_ReAct_Agent:
             # print(parsed_llm_response)
             if parsed_llm_response.get("Final Answer") is not None:
                 if DEBUG:
-                    print(f"#Final Answer: {parsed_llm_response['Final Answer']}")
-                self.add_memory(f"#Final Answer: {parsed_llm_response['Final Answer']}")
+                    print(f"##Final Answer: {parsed_llm_response['Final Answer']}")
+                self.add_memory(f"##Final Answer: {parsed_llm_response['Final Answer']}")
                 self.chat_conclude(user_input)
                 break
             observation, search_result_dict = self.run_action(parsed_llm_response)
@@ -109,19 +114,19 @@ class Custom_ReAct_Agent:
 
             if DEBUG:
                 print(chain_output)
-                print(f'#Observation: {observation}\n\n')
+                print(f'##Observation: {observation}\n\n')
                 for k in search_result_dict.keys():
                     print(f"{search_result_dict[k]['url']} {search_result_dict[k]['score']}")
                     print(f"{search_result_dict[k]['summary']}")
             
             # Update memory
-            new_memory = """#Thought: {thought}
-#Action: {action}
-#Action Input: {action_input}
-#Observation: {observation}
+            new_memory = """##Thought: {thought}
+##Action: {action}
+##Action Input: {action_input}
+##Observation: {observation}
 
-#Thought: 
+##Thought: 
 """.format(**parsed_llm_response)
             self.add_memory(new_memory)
-
+        print(f"Memory: {self.memory}")
         return self.memory, search_result_dict_list

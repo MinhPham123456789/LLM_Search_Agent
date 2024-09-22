@@ -113,7 +113,7 @@ print(llm_monitor.get_metrics())
 # )
 # # "Write a snake game using Golang"
 # # Do users have ownership of their data in HALO ticket system?
-# # 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?'
+# # 'is there "Block macros from running in Office files from the Internet" setting in MS Project 2016 GPO?'
 # QUERY = 'is there "Block macros from running in Office files from the Internet" in Microsoft Project 2016 GPO?' #'Write a basic tic tac toe game using Golang'
 # # print(search_tool.run(QUERY))
 # # print(search_tool.name)

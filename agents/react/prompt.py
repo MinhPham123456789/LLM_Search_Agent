@@ -18,17 +18,17 @@ The response should only contain a SINGLE action, do NOT return a list of multip
 
 ALWAYS STRICTLY use the following format:
 
-#Query: the input query you must answer
-#Thought: you should always think about what to do
-#Action: the action to take, should ONLY be one of {tool_names}
-#Action Input: the input to the action
-#Observation: the result of the action
+##Query: the input query you must answer
+##Thought: you should always think about what to do
+##Action: the action to take, should ONLY be one of {tool_names}
+##Action Input: the input to the action
+##Observation: the result of the action
 ...
-#Thought: I now know the final answer
-#Final Answer: the final answer to the original input question"""
+##Thought: I now know the final answer
+##Final Answer: the final answer to the original input question"""
 
 SYSTEM_MESSAGE_SUFFIX = """Begin! Reminder to always use the exact characters `Final Answer` when responding."""
-HUMAN_MESSAGE = "#Query: {input}"
+HUMAN_MESSAGE = "##Query: {input}"
 
 # CONCLUDING PROMPT SECTION
 
@@ -40,5 +40,5 @@ All the found information is in the following:
 """
 CONCLUDING_PROMPT_HUMAN = """Based on the found information, you need to use all relevant information and provide the Final Answer to user's query '{input}'.
 
-#Final Answer:
+##Final Answer:
 """

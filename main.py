@@ -3,6 +3,7 @@ from llms.cross_encoder import CrossEncoder
 from utils.text_summariser.text_summarisation import TextSummariser
 from utils.utils import rearrange_search_result
 import streamlit as st
+from utils.utils import LLMMonitor
 import configparser
 from global_config_path import config_path
 import os
@@ -10,11 +11,14 @@ import os
 config = configparser.ConfigParser()
 config.read(config_path)
 os.environ['HUGGINGFACEHUB_API_TOKEN'] = config['APIs']['HF_TOKEN']
+os.environ['GROQ_API_KEY'] = config['APIs']['GROQ_TOKEN']
 
+web_sum_mon = LLMMonitor()
+sum_sum_mon = LLMMonitor()
 
 reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-12-v2')
-web_sum = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct", "web_content_sum_prompt")
-sum_sum = TextSummariser("meta-llama/Meta-Llama-3-8B-Instruct","combine_prompt")
+web_sum = TextSummariser("llama3-8b-8192", "web_content_sum_prompt", web_sum_mon)
+sum_sum = TextSummariser("llama3-8b-8192","combine_prompt", sum_sum_mon)
 engine = GoogleSearchTool(reranker, web_sum, sum_sum) # May want to change the number of result to 10 max
 
 # To continuously add content to client side with streamlit
@@ -51,4 +55,8 @@ if text_search:
             st.markdown(f"{search_result_dict[key]['summary'].strip()}")
             st.markdown(f"{search_result_dict[key]['url']}")
         result_order_number = result_order_number + 1
+
+    print(f"Web Summary monitor:\n{web_sum_mon.get_metrics()}")
+    print(f"Sum Summary monitor:\n{sum_sum_mon.get_metrics()}")
+
 
