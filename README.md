@@ -27,6 +27,6 @@ A ReAct agent to research a topic/query provided by user. The ReAct agent's adva
 ![LLM Assisted Search Engine example 3](docs/LLM_Assisted_Search_Engine_example3.png)
 ![LLM Assisted Search Engine example 4](docs/LLM_Assisted_Search_Engine_example4.png)
 ## LLM Search ReAct Agent
-![LLM Search ReAct Agent example 1](docs/LLM_Search_Agent_Example1.png)
-![LLM Search ReAct Agent example 2](docs/LLM_Search_Agent_Example2.png)
-![LLM Search ReAct Agent example 3](docs/LLM_Search_Agent_Example3.png)
+![LLM Search ReAct Agent example 1](docs/LLM_Search_Agent_example1.png)
+![LLM Search ReAct Agent example 2](docs/LLM_Search_Agent_example2.png)
+![LLM Search ReAct Agent example 3](docs/LLM_Search_Agent_example3.png)
