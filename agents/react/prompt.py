@@ -1,4 +1,4 @@
-SYSTEM_MESSAGE_PREFIX = """Answer the following query as best you can.
+SYSTEM_MESSAGE_PREFIX = """Answer the following query as best and as straightforward as you can.
 Please utilize LLM's advantages and pursue efficient strategies for research planning
 
 1. You have a short-term memory of approximately 4,000 characters.

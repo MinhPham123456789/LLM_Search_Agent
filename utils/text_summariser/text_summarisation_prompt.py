@@ -6,7 +6,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain.chains.llm import LLMChain
 
 PROMPT_TEMPLATES = {
-    "web_content_sum_prompt":"""Extract the subtopics and summarise each subtopic with relevant details for the following:
+    "web_content_sum_prompt":"""Extract the important points and summarise each information point with relevant details for the following:
 
 
 "{docs}"
@@ -15,13 +15,13 @@ PROMPT_TEMPLATES = {
 The concise summary must closely answer the query "%s". Do not create unrelated comment or note or question.
 CONCISE SUMMARY:""",
 
-    "combine_prompt": """Extract and summarise each subtopic along with relevant details separately for the following:
+    "combine_prompt": """Extract and summarise each information point along with relevant details separately for the following:
 
 
 "{docs}"
 
 
-The concise summary must answer the query "%s". Do not create unrelated comment or note or question.
+The concise summary must straightforwardly answer the query "%s". Do not create unrelated comment or note or question.
 CONCISE SUMMARY:"""
 }
 

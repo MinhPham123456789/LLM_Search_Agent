@@ -41,7 +41,7 @@ search_tool = StructuredTool.from_function(
 )
 
 # Agent
-agent = Custom_ReAct_Agent("microsoft/Phi-3-mini-4k-instruct", [search_tool], agent_monitor)
+agent = Custom_ReAct_Agent("meta-llama/Meta-Llama-3-8B-Instruct", [search_tool], agent_monitor)
 
 # Page setups
 st.set_page_config(page_title="Agent Search Engine", page_icon="📜🔍", layout="wide")
